@@ -200,8 +200,8 @@ def glize(node):
     for child in node.children:
         glize(child)        
 
-
-camera = glm.vec3(0,0,15)
+camerai = glm.vec3(0,0,20)
+camera = glm.vec3(0,0,20)
 radio = camera.z
 pitch = 0 #angulo que se usa para rotar el objeto respecto al eje x
 yaw = 0 #angulo que se usa para rotar el objeto respecto al eje y
@@ -211,26 +211,40 @@ rotate = False
 zoom = False
 
 def camera_handle(ventana, key, scancode, action, mods):
-    global pitch, yaw, roll, rotate, zoom, axe
+    global pitch, yaw, roll, rotate, zoom, axe, camera
     #si se presiona una tecla
     if action == glfw.PRESS:
         #para rotar el objeto, se debera presionar la tecla R antes
         if key == glfw.KEY_R:
+            camera = camerai
             rotate = True
             zoom = False
         #si se desea mover en un eje estatico (zoom, no rotar), presionar la barra espaciadora antes
         if key == glfw.KEY_SPACE:
             rotate = False
             zoom = True
+        
         #para rotar el objeto
         if rotate == True:
             #definir el eje sobre el cual se desea rotar
             if key == glfw.KEY_X:
                 axe = 'X'
+                camera = camerai
             if key == glfw.KEY_Y:
                 axe = 'Y'
+                camera = camerai
             if key == glfw.KEY_Z:
                 axe = 'Z'
+                camera = glm.vec3(0,0,15)
+            #rotar respecto al eje X
+            if key == glfw.KEY_LEFT and axe == 'X':
+                pitch += 0.3
+                camera.y = math.sin(pitch) * radio
+                camera.z = math.cos(pitch) * radio
+            if key == glfw.KEY_RIGHT and axe == 'X':
+                pitch -= 0.3
+                camera.y = math.sin(pitch) * radio
+                camera.z = math.cos(pitch) * radio
             #rotar respecto al eje Y
             if key == glfw.KEY_LEFT and axe == 'Y':
                 yaw += 0.3
@@ -249,15 +263,6 @@ def camera_handle(ventana, key, scancode, action, mods):
                 roll -= 0.3
                 camera.y = math.sin(roll) * radio
                 camera.x = math.cos(roll) * radio
-            #rotar respecto al eje X
-            if key == glfw.KEY_LEFT and axe == 'X':
-                pitch += 0.3
-                camera.y = math.sin(pitch) * radio
-                camera.z = math.cos(pitch) * radio
-            if key == glfw.KEY_RIGHT and axe == 'X':
-                pitch -= 0.3
-                camera.y = math.sin(pitch) * radio
-                camera.z = math.cos(pitch) * radio
 
 while not glfw.window_should_close(window):
 	# Enable key events
