@@ -31,8 +31,8 @@ lighting = glm.vec3(-10,20,30)
 ogTexture = True #para el cambio de las texturas, primero se cargara la original
 newTexture = ""    #la textura a la cual se desea cambiar
 #variables para la rotación y zoom 
-camerai = glm.vec3(0,0,20)
-camera = glm.vec3(0,0,20)
+camerai = glm.vec3(0,0,15)
+camera = glm.vec3(0,0,15)
 center = glm.vec3(0,0,0)
 camera_speedz = 5
 camera_speedxy = 0.5
@@ -159,7 +159,7 @@ def getTexture(mesh):
         texture = material['file'][0:]
         path = fullPath+ "/coliseo/"+texture
     else:
-        path = fullPath+ "textures"+newTexture
+        path = fullPath+ "textures/"+newTexture
     return path
 
 
@@ -242,6 +242,7 @@ def camera_handle(ventana, key, scancode, action, mods):
         #para rotar el objeto, se debera presionar la tecla R antes
         if key == glfw.KEY_R:
             camera = camerai
+            center.x, center.y, center.z = 0,0,0
             rotate = True
             zoom = False
             texturas = False
@@ -261,14 +262,20 @@ def camera_handle(ventana, key, scancode, action, mods):
         if rotate == True:
             #definir el eje sobre el cual se desea rotar
             if key == glfw.KEY_X:
+                camera.x, camera.y, camera.z = camerai.x, camerai.y, camerai.z
+                center.x, center.y, center.z = 0,0,0
+                pitch,yaw, roll = 0,0,0
                 axe = 'X'
-                camera = camerai
             if key == glfw.KEY_Y:
                 axe = 'Y'
-                camera = camerai
+                camera.x, camera.y, camera.z = camerai.x, camerai.y, camerai.z
+                center.x, center.y, center.z = 0,0,0
+                pitch, yaw, roll =0,0,0
             if key == glfw.KEY_Z:
                 axe = 'Z'
-                camera = camerai
+                camera.x, camera.y, camera.z = camerai.x, camerai.y, camerai.z
+                center.x, center.y, center.z = 0,0,0
+                pitch, yaw = 0,0
             #rotar respecto al eje X
             if key == glfw.KEY_LEFT and axe == 'X':
                 pitch += 0.3
@@ -296,38 +303,53 @@ def camera_handle(ventana, key, scancode, action, mods):
                 roll -= 0.3
                 camera.y = math.sin(roll) * radio
                 camera.x = math.cos(roll) * radio
-        elif zoom == True:
+        if zoom == True:
             #definir el eje sobre el cual se desea movilizar
             if key == glfw.KEY_X:
                 axe = 'X'
                 camera = camerai
+                center.x,center.y,center.z = 0,0,0
             if key == glfw.KEY_Y:
                 axe = 'Y'
                 camera = camerai
+                center.x,center.y,center.z = 0,0,0
             if key == glfw.KEY_Z:
                 axe = 'Z'
                 camera = camerai
+                center.x,center.y,center.z = 0,0,0
             #moverse en el eje x
             if key == glfw.KEY_UP and axe == 'X':
                 camera.x += camera_speedxy
                 center.x += camera_speedxy
+                if camera.x >= 2:
+                    camera.x = 2
             if key == glfw.KEY_DOWN and axe == 'X':
                 camera.x -= camera_speedxy
                 center.x -= camera_speedxy
+                if camera.x <= -5:
+                    camera.x = -5
             #moverse en el eje y
             if key == glfw.KEY_UP and axe == 'Y':
                 camera.y += camera_speedxy
                 center.y += camera_speedxy
+                if camera.y >= 4:
+                    camera.y = 4
             if key == glfw.KEY_DOWN and axe == 'Y':
                 camera.y -= camera_speedxy
                 center.y -= camera_speedxy
+                if camera.y <= -3:
+                    camera.y = -3
             #moverse en el eje z
             if key == glfw.KEY_UP and axe == 'Z':
                 camera.z -= camera_speedz
                 center.z -= camera_speedz
+                if camera.z <= 7:
+                    camera.z = 7
             if key == glfw.KEY_DOWN and axe == 'Z':
                 camera.z += camera_speedz
                 center.z += camera_speedz
+                if camera.z >= 40:
+                    camera.z = 40
         if texturas == True:
             if key == glfw.KEY_0:
                 ogTexture = True
