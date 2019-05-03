@@ -202,6 +202,7 @@ def glize(node):
 
 camerai = glm.vec3(0,0,20)
 camera = glm.vec3(0,0,20)
+camera_speed = 5
 radio = camera.z
 pitch = 0 #angulo que se usa para rotar el objeto respecto al eje x
 yaw = 0 #angulo que se usa para rotar el objeto respecto al eje y
@@ -219,10 +220,12 @@ def camera_handle(ventana, key, scancode, action, mods):
             camera = camerai
             rotate = True
             zoom = False
+            axe =''
         #si se desea mover en un eje estatico (zoom, no rotar), presionar la barra espaciadora antes
         if key == glfw.KEY_SPACE:
             rotate = False
             zoom = True
+            axe =''
         
         #para rotar el objeto
         if rotate == True:
@@ -235,7 +238,7 @@ def camera_handle(ventana, key, scancode, action, mods):
                 camera = camerai
             if key == glfw.KEY_Z:
                 axe = 'Z'
-                camera = glm.vec3(0,0,15)
+                camera = camerai
             #rotar respecto al eje X
             if key == glfw.KEY_LEFT and axe == 'X':
                 pitch += 0.3
@@ -263,6 +266,45 @@ def camera_handle(ventana, key, scancode, action, mods):
                 roll -= 0.3
                 camera.y = math.sin(roll) * radio
                 camera.x = math.cos(roll) * radio
+        elif zoom == True:
+            #definir el eje sobre el cual se desea movilizar
+            if key == glfw.KEY_X:
+                axe = 'X'
+                camera = camerai
+            if key == glfw.KEY_Y:
+                axe = 'Y'
+                camera = camerai
+            if key == glfw.KEY_Z:
+                axe = 'Z'
+                camera = camerai
+            #moverse en el eje x
+            if key == glfw.KEY_UP and axe == 'X':
+                camera.x += camera_speed
+                camera.y = camerai.y
+                camera.z = camerai.z
+            if key == glfw.KEY_DOWN and axe == 'X':
+                camera.x -= camera_speed
+                camera.y = camerai.y
+                camera.z = camerai.z
+            #moverse en el eje y
+            if key == glfw.KEY_UP and axe == 'Y':
+                camera.y += camera_speed
+                camera.x = camerai.x
+                camera.z = camerai.z
+            if key == glfw.KEY_DOWN and axe == 'Y':
+                camera.y -= camera_speed
+                camera.x = camerai.x
+                camera.z = camerai.z
+            #moverse en el eje z
+            if key == glfw.KEY_UP and axe == 'Z':
+                camera.z -= camera_speed
+                camera.x = camerai.x
+                camera.y = camerai.y
+            if key == glfw.KEY_DOWN and axe == 'Z':
+                camera.z += camera_speed
+                camera.x = camerai.x
+                camera.y = camerai.y
+
 
 while not glfw.window_should_close(window):
 	# Enable key events
