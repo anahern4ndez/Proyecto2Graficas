@@ -123,6 +123,18 @@ projection = glm.perspective(glm.radians(45), 800/600, 0.1, 1000.0)
 gl.glViewport(0, 0, 800, 600)
 scene = pyassimp.load("/Users/polaris/Documents/5/GRAFICAS/proyecto2/wt/tower.obj")
 #scene = pywavefront.Wavefront("/Users/polaris/Documents/5/GRAFICAS/proyecto2/spider.obj")
+ogTexture = True #para el cambio de las texturas, primero se cargara la original
+newTexture = ""    #la textura a la cual se desea cambiar
+def getTexture(mesh):
+    
+    if ogTexture == True:
+        material = dict(mesh.material.properties.items())
+        texture = material['file'][0:-7]
+        path = "/Users/polaris/Documents/5/GRAFICAS/proyecto2/wt/"+texture+"Col.jpg"
+    else:
+        path = "/Users/polaris/Documents/5/GRAFICAS/proyecto2/"+newTexture
+    return path
+
 
 def glize(node):
     model = node.transformation.astype(numpy.float32)
@@ -142,10 +154,8 @@ def glize(node):
 
 
     for mesh in node.meshes:
-        material = dict(mesh.material.properties.items())
-        texture = material['file'][0:]
         #assert False , texture #prueba para ver el nombre de la textura
-        texture_surface =  pygame.image.load("/Users/polaris/Documents/5/GRAFICAS/proyecto2/wt/"+texture)
+        texture_surface =  pygame.image.load(getTexture(mesh))
         texture_data = pygame.image.tostring(texture_surface, "RGB", 1)
         width = texture_surface.get_width()
         height = texture_surface.get_height()
@@ -202,7 +212,9 @@ def glize(node):
 
 camerai = glm.vec3(0,0,20)
 camera = glm.vec3(0,0,20)
-camera_speed = 5
+center = glm.vec3(0,0,0)
+camera_speedz = 5
+camera_speedxy = 0.5
 radio = camera.z
 pitch = 0 #angulo que se usa para rotar el objeto respecto al eje x
 yaw = 0 #angulo que se usa para rotar el objeto respecto al eje y
@@ -210,9 +222,10 @@ roll = 0 #angulo que se usa para rotar el objeto respecto al eje z
 axe ="" #eje sobre el cual se desea realizar el zoom
 rotate = False
 zoom = False
+texturas = False
 
 def camera_handle(ventana, key, scancode, action, mods):
-    global pitch, yaw, roll, rotate, zoom, axe, camera
+    global pitch, yaw, roll, rotate, zoom, axe, camera, texturas, ogTexture, newTexture
     #si se presiona una tecla
     if action == glfw.PRESS:
         #para rotar el objeto, se debera presionar la tecla R antes
@@ -220,13 +233,18 @@ def camera_handle(ventana, key, scancode, action, mods):
             camera = camerai
             rotate = True
             zoom = False
+            texturas = False
             axe =''
         #si se desea mover en un eje estatico (zoom, no rotar), presionar la barra espaciadora antes
         if key == glfw.KEY_SPACE:
             rotate = False
             zoom = True
+            texturas = False
             axe =''
-        
+        if key == glfw.KEY_T:
+            rotate = False
+            zoom = False
+            texturas = True
         #para rotar el objeto
         if rotate == True:
             #definir el eje sobre el cual se desea rotar
@@ -279,32 +297,31 @@ def camera_handle(ventana, key, scancode, action, mods):
                 camera = camerai
             #moverse en el eje x
             if key == glfw.KEY_UP and axe == 'X':
-                camera.x += camera_speed
-                camera.y = camerai.y
-                camera.z = camerai.z
+                camera.x += camera_speedxy
+                center.x += camera_speedxy
             if key == glfw.KEY_DOWN and axe == 'X':
-                camera.x -= camera_speed
-                camera.y = camerai.y
-                camera.z = camerai.z
+                camera.x -= camera_speedxy
+                center.x -= camera_speedxy
             #moverse en el eje y
             if key == glfw.KEY_UP and axe == 'Y':
-                camera.y += camera_speed
-                camera.x = camerai.x
-                camera.z = camerai.z
+                camera.y += camera_speedxy
+                center.y += camera_speedxy
             if key == glfw.KEY_DOWN and axe == 'Y':
-                camera.y -= camera_speed
-                camera.x = camerai.x
-                camera.z = camerai.z
+                camera.y -= camera_speedxy
+                center.y -= camera_speedxy
             #moverse en el eje z
             if key == glfw.KEY_UP and axe == 'Z':
-                camera.z -= camera_speed
-                camera.x = camerai.x
-                camera.y = camerai.y
+                camera.z -= camera_speedz
+                center.z -= camera_speedz
             if key == glfw.KEY_DOWN and axe == 'Z':
-                camera.z += camera_speed
-                camera.x = camerai.x
-                camera.y = camerai.y
-
+                camera.z += camera_speedz
+                center.z += camera_speedz
+        if texturas == True:
+            if key == glfw.KEY_0:
+                ogTexture = True
+            if key == glfw.KEY_1:
+                ogTexture = False
+                newTexture = "polka.jpg"
 
 while not glfw.window_should_close(window):
 	# Enable key events
@@ -314,7 +331,7 @@ while not glfw.window_should_close(window):
     gl.glClear(gl.GL_COLOR_BUFFER_BIT|gl.GL_DEPTH_BUFFER_BIT)
 
     gl.glUseProgram(shader)
-    view = glm.lookAt(camera, glm.vec3(0,0,0), glm.vec3(0, 1, 0))
+    view = glm.lookAt(camera, center, glm.vec3(0, 1, 0))
 
     glize(scene.rootnode)
 
