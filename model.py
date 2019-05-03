@@ -17,6 +17,34 @@ import pygame
 
 glfw.init()
 
+''' declaración de todas las variables '''
+
+#matrices 
+model = glm.mat4(1) 
+view = glm.mat4(1)
+projection = glm.perspective(glm.radians(45), 800/600, 0.1, 100.0)
+
+#vector para la luz
+lighting = glm.vec3(-10,20,30)
+
+#variables para el cambio de texturas
+ogTexture = True #para el cambio de las texturas, primero se cargara la original
+newTexture = ""    #la textura a la cual se desea cambiar
+camerai = glm.vec3(0,0,20)
+camera = glm.vec3(0,0,20)
+center = glm.vec3(0,0,0)
+camera_speedz = 5
+camera_speedxy = 0.5
+radio = camera.z
+pitch = 0 #angulo que se usa para rotar el objeto respecto al eje x
+yaw = 0 #angulo que se usa para rotar el objeto respecto al eje y
+roll = 0 #angulo que se usa para rotar el objeto respecto al eje z
+axe ="" #eje sobre el cual se desea realizar el zoom
+rotate = False
+zoom = False
+texturas = False
+
+
 # this makes opengl work on mac (https://developer.apple.com/library/content/documentation/GraphicsImaging/Conceptual/OpenGL-MacProgGuide/UpdatinganApplicationtoSupportOpenGL3/UpdatinganApplicationtoSupportOpenGL3.html)
 glfw.window_hint(glfw.CONTEXT_VERSION_MAJOR, 3)
 glfw.window_hint(glfw.CONTEXT_VERSION_MINOR, 3)
@@ -46,7 +74,7 @@ out vec2 vertexTexcoords;
 
 void main()
 {
-    float intensity = dot(normal, normalize(light - position));
+    float intensity = dot(normal, normalize(light - position))*2;
 
     gl_Position = projection * view * model * position;
     vertexColor = color * intensity;
@@ -113,18 +141,13 @@ shader = shaders.compileProgram(
 gl.glUseProgram(shader)
 gl.glClearColor(0.5, 0.5, 0.5, 1.0)
 
+gl.glViewport(0, 0, 800, 600)
+#cargar el obj
+scene = pyassimp.load("/Users/polaris/Documents/5/GRAFICAS/proyecto2/wt/tower.obj")
+
 # glfw requires shaders to be compiled after buffer binding
 #NOTA PARA MAC use program shader tiene que estar despues de los buffers
 
-#matrices 
-model = glm.mat4(1) 
-view = glm.mat4(1)
-projection = glm.perspective(glm.radians(45), 800/600, 0.1, 1000.0)
-gl.glViewport(0, 0, 800, 600)
-scene = pyassimp.load("/Users/polaris/Documents/5/GRAFICAS/proyecto2/wt/tower.obj")
-#scene = pywavefront.Wavefront("/Users/polaris/Documents/5/GRAFICAS/proyecto2/spider.obj")
-ogTexture = True #para el cambio de las texturas, primero se cargara la original
-newTexture = ""    #la textura a la cual se desea cambiar
 def getTexture(mesh):
     
     if ogTexture == True:
@@ -132,7 +155,7 @@ def getTexture(mesh):
         texture = material['file'][0:-7]
         path = "/Users/polaris/Documents/5/GRAFICAS/proyecto2/wt/"+texture+"Col.jpg"
     else:
-        path = "/Users/polaris/Documents/5/GRAFICAS/proyecto2/"+newTexture
+        path = "/Users/polaris/Documents/5/GRAFICAS/proyecto2/textures"+newTexture
     return path
 
 
@@ -151,7 +174,6 @@ def glize(node):
         gl.glGetUniformLocation(shader, "projection"), 1 , gl.GL_FALSE, 
         glm.value_ptr(projection)
     )
-
 
     for mesh in node.meshes:
         #assert False , texture #prueba para ver el nombre de la textura
@@ -201,28 +223,14 @@ def glize(node):
 
         gl.glUniform4f(
             gl.glGetUniformLocation(shader, "light"), 
-            -100, 300, 0, 1
+            int(lighting.x), int(lighting.y), int(lighting.z), 1
         )
-
         gl.glDrawElements(gl.GL_TRIANGLES, len(index_data), gl.GL_UNSIGNED_INT, None)
 
 
     for child in node.children:
         glize(child)        
 
-camerai = glm.vec3(0,0,20)
-camera = glm.vec3(0,0,20)
-center = glm.vec3(0,0,0)
-camera_speedz = 5
-camera_speedxy = 0.5
-radio = camera.z
-pitch = 0 #angulo que se usa para rotar el objeto respecto al eje x
-yaw = 0 #angulo que se usa para rotar el objeto respecto al eje y
-roll = 0 #angulo que se usa para rotar el objeto respecto al eje z
-axe ="" #eje sobre el cual se desea realizar el zoom
-rotate = False
-zoom = False
-texturas = False
 
 def camera_handle(ventana, key, scancode, action, mods):
     global pitch, yaw, roll, rotate, zoom, axe, camera, texturas, ogTexture, newTexture
@@ -322,6 +330,15 @@ def camera_handle(ventana, key, scancode, action, mods):
             if key == glfw.KEY_1:
                 ogTexture = False
                 newTexture = "polka.jpg"
+            if key == glfw.KEY_2:
+                ogTexture = False
+                newTexture = "grunge_wall.jpg"
+            if key == glfw.KEY_3:
+                ogTexture = False
+                newTexture = "old_rock.jpg"
+            if key == glfw.KEY_4:
+                ogTexture = False
+                newTexture = "solar.jpg"
 
 while not glfw.window_should_close(window):
 	# Enable key events
