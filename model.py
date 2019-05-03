@@ -30,6 +30,7 @@ lighting = glm.vec3(-10,20,30)
 #variables para el cambio de texturas
 ogTexture = True #para el cambio de las texturas, primero se cargara la original
 newTexture = ""    #la textura a la cual se desea cambiar
+#variables para la rotación y zoom 
 camerai = glm.vec3(0,0,20)
 camera = glm.vec3(0,0,20)
 center = glm.vec3(0,0,0)
@@ -43,6 +44,9 @@ axe ="" #eje sobre el cual se desea realizar el zoom
 rotate = False
 zoom = False
 texturas = False
+
+#path para la carpeta del proyecto 
+fullPath = "/Users/polaris/Documents/5/GRAFICAS/proyecto2/"
 
 
 # this makes opengl work on mac (https://developer.apple.com/library/content/documentation/GraphicsImaging/Conceptual/OpenGL-MacProgGuide/UpdatinganApplicationtoSupportOpenGL3/UpdatinganApplicationtoSupportOpenGL3.html)
@@ -143,7 +147,7 @@ gl.glClearColor(0.5, 0.5, 0.5, 1.0)
 
 gl.glViewport(0, 0, 800, 600)
 #cargar el obj
-scene = pyassimp.load("/Users/polaris/Documents/5/GRAFICAS/proyecto2/wt/tower.obj")
+scene = pyassimp.load(fullPath+ "coliseo/coliseo.obj")
 
 # glfw requires shaders to be compiled after buffer binding
 #NOTA PARA MAC use program shader tiene que estar despues de los buffers
@@ -152,10 +156,10 @@ def getTexture(mesh):
     
     if ogTexture == True:
         material = dict(mesh.material.properties.items())
-        texture = material['file'][0:-7]
-        path = "/Users/polaris/Documents/5/GRAFICAS/proyecto2/wt/"+texture+"Col.jpg"
+        texture = material['file'][0:]
+        path = fullPath+ "/coliseo/"+texture
     else:
-        path = "/Users/polaris/Documents/5/GRAFICAS/proyecto2/textures"+newTexture
+        path = fullPath+ "textures"+newTexture
     return path
 
 
@@ -214,7 +218,6 @@ def glize(node):
         gl.glBufferData(gl.GL_ELEMENT_ARRAY_BUFFER, index_data.nbytes, index_data, gl.GL_STATIC_DRAW)
 
         diffuse = mesh.material.properties["diffuse"]
-
         gl.glUniform4f(
             gl.glGetUniformLocation(shader, "color"),
             *diffuse,
@@ -253,6 +256,7 @@ def camera_handle(ventana, key, scancode, action, mods):
             rotate = False
             zoom = False
             texturas = True
+            axe =''
         #para rotar el objeto
         if rotate == True:
             #definir el eje sobre el cual se desea rotar
