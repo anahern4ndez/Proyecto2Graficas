@@ -265,45 +265,35 @@ def camera_handle(ventana, key, scancode, action, mods):
             if key == glfw.KEY_X:
                 camera.x, camera.y, camera.z = camerai.x, camerai.y, camerai.z
                 center.x, center.y, center.z = 0,0,0
-                pitch,yaw, roll = 0,-90,0
+                pitch,yaw, roll = 0,0,0
                 view = glm.lookAt(camerai, glm.vec3(0, 0, 0), glm.vec3(0, 1, 0))
                 axe = 'X'
             if key == glfw.KEY_Y:
                 axe = 'Y'
                 camera.x, camera.y, camera.z = camerai.x, camerai.y, camerai.z
                 center.x, center.y, center.z = 0,0,0
-                pitch,yaw, roll = 0,-90,0
+                pitch,yaw, roll = 0,0,0
                 view = glm.lookAt(camerai, glm.vec3(0, 0, 0), glm.vec3(0, 1, 0))
             if key == glfw.KEY_Z:
                 axe = 'Z'
                 camera.x, camera.y, camera.z = camerai.x, camerai.y, camerai.z
                 center.x, center.y, center.z = 0,0,0
-                pitch,yaw, roll = 0,-90,0
+                pitch,yaw, roll = 0,0,0
                 view = glm.lookAt(camerai, glm.vec3(0, 0, 0), glm.vec3(0, 1, 0))
             #rotar respecto al eje X
             if key == glfw.KEY_LEFT and axe == 'X':
                 pitch += 0.3
                 camera.y = math.sin(pitch) * radio
                 camera.z = math.cos(pitch) * radio
-                if pitch > math.pi/2:
-                    pitch = math.pi/2
             if key == glfw.KEY_RIGHT and axe == 'X':
                 pitch -= 0.3
                 camera.y = math.sin(pitch) * radio
                 camera.z = math.cos(pitch) * radio
-                if camera.z == camera.y:
-                    camera.z +=1
-                elif camera.z == camera.x:
-                    camera.z+=1
             #rotar respecto al eje Y
             if key == glfw.KEY_LEFT and axe == 'Y':
                 yaw += 0.3
                 camera.x = math.sin(yaw) * radio
                 camera.z = math.cos(yaw) * radio
-                if camera.z == camera.y:
-                    camera.z +=1
-                elif camera.z == camera.x:
-                    camera.z+=1
             if key == glfw.KEY_RIGHT and axe == 'Y':
                 yaw -= 0.3
                 camera.x = math.sin(yaw) * radio
