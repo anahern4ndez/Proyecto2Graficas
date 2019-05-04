@@ -31,9 +31,10 @@ lighting = glm.vec3(-10,20,30)
 ogTexture = True #para el cambio de las texturas, primero se cargara la original
 newTexture = ""    #la textura a la cual se desea cambiar
 #variables para la rotación y zoom 
-camerai = glm.vec3(0,0,15)
-camera = glm.vec3(0,0,15)
+camerai = glm.vec3(0,0,10)
+camera = glm.vec3(0,0,10)
 center = glm.vec3(0,0,0)
+up = glm.vec3(0, 1, 0)
 camera_speedz = 5
 camera_speedxy = 0.5
 radio = camera.z
@@ -236,7 +237,7 @@ def glize(node):
 
 
 def camera_handle(ventana, key, scancode, action, mods):
-    global pitch, yaw, roll, rotate, zoom, axe, camera, texturas, ogTexture, newTexture
+    global pitch, yaw, roll, rotate, zoom, axe, camera, texturas, ogTexture, newTexture, view
     #si se presiona una tecla
     if action == glfw.PRESS:
         #para rotar el objeto, se debera presionar la tecla R antes
@@ -264,32 +265,45 @@ def camera_handle(ventana, key, scancode, action, mods):
             if key == glfw.KEY_X:
                 camera.x, camera.y, camera.z = camerai.x, camerai.y, camerai.z
                 center.x, center.y, center.z = 0,0,0
-                pitch,yaw, roll = 0,0,0
+                pitch,yaw, roll = 0,-90,0
+                view = glm.lookAt(camerai, glm.vec3(0, 0, 0), glm.vec3(0, 1, 0))
                 axe = 'X'
             if key == glfw.KEY_Y:
                 axe = 'Y'
                 camera.x, camera.y, camera.z = camerai.x, camerai.y, camerai.z
                 center.x, center.y, center.z = 0,0,0
-                pitch, yaw, roll =0,0,0
+                pitch,yaw, roll = 0,-90,0
+                view = glm.lookAt(camerai, glm.vec3(0, 0, 0), glm.vec3(0, 1, 0))
             if key == glfw.KEY_Z:
                 axe = 'Z'
                 camera.x, camera.y, camera.z = camerai.x, camerai.y, camerai.z
                 center.x, center.y, center.z = 0,0,0
-                pitch, yaw = 0,0
+                pitch,yaw, roll = 0,-90,0
+                view = glm.lookAt(camerai, glm.vec3(0, 0, 0), glm.vec3(0, 1, 0))
             #rotar respecto al eje X
             if key == glfw.KEY_LEFT and axe == 'X':
                 pitch += 0.3
                 camera.y = math.sin(pitch) * radio
                 camera.z = math.cos(pitch) * radio
+                if pitch > math.pi/2:
+                    pitch = math.pi/2
             if key == glfw.KEY_RIGHT and axe == 'X':
                 pitch -= 0.3
                 camera.y = math.sin(pitch) * radio
                 camera.z = math.cos(pitch) * radio
+                if camera.z == camera.y:
+                    camera.z +=1
+                elif camera.z == camera.x:
+                    camera.z+=1
             #rotar respecto al eje Y
             if key == glfw.KEY_LEFT and axe == 'Y':
                 yaw += 0.3
                 camera.x = math.sin(yaw) * radio
                 camera.z = math.cos(yaw) * radio
+                if camera.z == camera.y:
+                    camera.z +=1
+                elif camera.z == camera.x:
+                    camera.z+=1
             if key == glfw.KEY_RIGHT and axe == 'Y':
                 yaw -= 0.3
                 camera.x = math.sin(yaw) * radio
@@ -297,12 +311,12 @@ def camera_handle(ventana, key, scancode, action, mods):
             #rotar respecto al eje Z
             if key == glfw.KEY_LEFT and axe == 'Z':
                 roll += 0.3
-                camera.y = math.sin(roll) * radio
-                camera.x = math.cos(roll) * radio
+                up.y = math.sin(roll) * radio
+                up.x = math.cos(roll) * radio
             if key == glfw.KEY_RIGHT and axe == 'Z':
                 roll -= 0.3
-                camera.y = math.sin(roll) * radio
-                camera.x = math.cos(roll) * radio
+                up.y = math.sin(roll) * radio
+                up.x = math.cos(roll) * radio
         if zoom == True:
             #definir el eje sobre el cual se desea movilizar
             if key == glfw.KEY_X:
@@ -374,7 +388,7 @@ while not glfw.window_should_close(window):
     gl.glClear(gl.GL_COLOR_BUFFER_BIT|gl.GL_DEPTH_BUFFER_BIT)
 
     gl.glUseProgram(shader)
-    view = glm.lookAt(camera, center, glm.vec3(0, 1, 0))
+    view = glm.lookAt(camera, center, up)
 
     glize(scene.rootnode)
 
