@@ -24,5 +24,5 @@ La cámara tiene las siguientes acciones que puede realizar:
             - 3: cambiará a la textura de una roca normal. 
             - 4: cambiará a la textura de un planeta rojo (venus).
 
-
+El modelo activado por el momento es el del coliseo, pero se incluyen otros modelos, como el de watch tower y la araña que también se pueden utilizar. 
 
